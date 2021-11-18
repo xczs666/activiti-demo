@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  增加monitorInterval="30"可以动态刷新 status="debug"可以debug -->
+<configuration>
+    <!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+    <!--变量配置-->
+    <Properties>
+        <!-- 格式化输出：%date表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度 %msg：日志消息，%n是换行符-->
+        <!-- %logger{36} 表示 Logger 名字最长36个字符 -->
+        <property name="LOG_PATTERN"
+                  value="%-5level|%date{DEFAULT}|%thread|%c{1.}|%F:%L|%X{traceId}##%X{spanId}##%msg%n"/>
+
+        <!-- 定义日志存储的路径 -->
+        <property name="FILE_PATH" value="logs/"/>
+        <!-- 命令行-Dlog.appender=null可用配置不输出到控制台 -->
+        <property name="CONSOLE_APPENDER">${sys:log.appender:-console}</property>
+    </Properties>
+
+    <appenders>
+        <console name="console" target="SYSTEM_OUT">
+            <!--输出日志的格式-->
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <!--控制台只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+        </console>
+        <Null name="null"/>
+
+        <!--文件会打印出所有信息，这个log每次运行程序会自动清空，由append属性决定，适合临时测试用-->
+        <File name="onceFile" fileName="${FILE_PATH}/test.log" append="false">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </File>
+
+        <!-- 这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <!-- immediateFlush="false" -->
+        <RollingRandomAccessFile name="infoFile" fileName="${FILE_PATH}/all.log" immediateFlush="false"
+                                 filePattern="${FILE_PATH}/all.%d{yyyyMMdd}_%i.log">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!-- 每天创建一个日志文件 -->
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="1GB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下30个文件开始覆盖-->
+            <DefaultRolloverStrategy max="7"/>
+        </RollingRandomAccessFile>
+
+        <!-- 这个会打印出所有的warn及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingRandomAccessFile name="warnFile" fileName="${FILE_PATH}/error.log" immediateFlush="false"
+                                 filePattern="${FILE_PATH}/error.%d{yyyyMMdd}_%i.log">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!-- 每天创建一个日志文件 -->
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下30个文件开始覆盖-->
+            <DefaultRolloverStrategy max="7"/>
+        </RollingRandomAccessFile>
+    </appenders>
+
+    <!--Logger节点用来单独指定日志的形式，比如要为指定包下的class指定不同的日志级别等。-->
+    <!--然后定义loggers，只有定义了logger并引入的appender，appender才会生效-->
+    <loggers>
+        <!-- 若是additivity设为false，则子Logger 只会在自己的appender里输出，而不会在 父Logger 的appender里输出。 -->
+        <logger name="com.netflix" level="WARN"/>
+        <logger name="org.springframework" level="WARN"/>
+        <!-- MockMvcResultHandlers mvc log -->
+        <logger name="org.springframework.test.web.servlet.result" level="DEBUG" additivity="false">
+            <appender-ref ref="${CONSOLE_APPENDER}"/>
+            <appender-ref ref="onceFile"/>
+        </logger>
+        <root level="INFO" includeLocation="true">
+            <appender-ref ref="${CONSOLE_APPENDER}"/>
+            <appender-ref ref="onceFile"/>
+            <appender-ref ref="infoFile"/>
+            <appender-ref ref="warnFile"/>
+        </root>
+    </loggers>
+</configuration>

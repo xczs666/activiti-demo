@@ -1,0 +1,16 @@
+                  Activiti7入门
+
+Activiti是目前使用最常用的工作流引擎，在企业中的应用非常广泛。
+内容主要分为3部分
+一、Activiti的基础入门
+二、Activiti的高级应用
+三、Activiti与Spring的整合，编写应用DEMO
+
+有一定的JAVA编程基础，MySQL数据库，了解Web开发和Spring框架
+
+掌握Activiti的架构、数据结构
+掌握Activiti的基本原理
+会使用Activiti提供的API完成业务
+可以把Activiti和第三方框架整合使用
+
+

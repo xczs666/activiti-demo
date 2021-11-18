@@ -1,0 +1,31 @@
+spring:
+  activiti:
+    database-schema-update: true
+    db-history-used: true
+    history-level: audit
+    check-process-definitions: true
+  main:
+    allow-bean-definition-overriding: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    # 反序列化浮点类型时使用BigDecimal（默认只有双精度浮点Double才使用BigDecimal）
+    deserialization:
+      USE_BIG_DECIMAL_FOR_FLOATS: true
+    # 序列化BigDecimal使用toPlainString
+    serialization:
+      WRITE_BIGDECIMAL_AS_PLAIN: true
+  messages:
+    basename: i18n/message
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:za_bank_eln;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_UPPER=false
+    username:
+    password:
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: auto
+
