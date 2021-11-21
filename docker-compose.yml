@@ -11,10 +11,12 @@ services:
       - MYSQL_DATABASE=xczdb
 
   activiti-base:
-    image: jenkinxu/activiti-base:1.0.0-SNAPSHOT
-    # depends_no是docker启动顺序而不会等待服务完成，所以可能因为服务依赖而失败
-    restart: always
+    image: activiti-base:1.0.0-SNAPSHOT
     depends_on:
       - mysql
     links:
       - mysql
+    environment:
+      WAIT_HOSTS: mysql:3306
+      WAIT_TIMEOUT: 60
+      WAIT_HOST_CONNECT_TIMEOUT: 30
