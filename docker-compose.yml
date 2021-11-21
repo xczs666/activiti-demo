@@ -16,6 +16,8 @@ services:
       dockerfile: src/docker/Dockerfile
       args:
         JAR_FILE: activiti-base-1.0.0-SNAPSHOT.jar
+    image: jenkinxu/activiti-base:1.0.0-SNAPSHOT
+    container_name: activiti-demo-base
     depends_on:
       - mysql
     links:
