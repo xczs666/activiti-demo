@@ -11,7 +11,11 @@ services:
       - MYSQL_DATABASE=xczdb
 
   activiti-base:
-    image: activiti-base:1.0.0-SNAPSHOT
+    build:
+      context: ./activiti-base
+      dockerfile: src/docker/Dockerfile
+      args:
+        JAR_FILE: activiti-base-1.0.0-SNAPSHOT.jar
     depends_on:
       - mysql
     links:
